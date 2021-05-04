@@ -3,7 +3,11 @@ for dev:
 
 
 rename docker docker-compose.override.example.yml to docker-compose.override.yml
+
+
 docker exec -it container_name /bin/sh
+
+
 npm run dev
 
 
