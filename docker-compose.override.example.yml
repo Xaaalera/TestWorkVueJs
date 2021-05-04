@@ -1,0 +1,46 @@
+version: '3.8'
+
+x-container: &container
+  logging:
+    driver: json-file
+    options:
+      max-size: '12m'
+      max-file: '5'
+
+
+
+services:
+  webserver:
+    <<: *container
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    ports:
+      - 10780:80
+    volumes:
+      - ./www:/var/www
+      - ./docker/nginx/:/etc/nginx/conf.d/
+
+  npm:
+    <<: *container
+    image: xaaalera/node-deals-test
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    #    restart: "no"
+    environment:
+      - NODE_ENV=dev
+    user: $UID:$GID
+    volumes:
+      - ./www:/var/www
+      - ./dev-cache/node_modules:/var/www/node_modules
+    working_dir: /var/www
+    entrypoint: sh
+    command:
+      - -c
+      - |
+        watch -t true
+
+volumes:
+  vendor:
+  node_modules:

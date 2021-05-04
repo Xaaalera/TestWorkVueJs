@@ -1,0 +1,34 @@
+version: "3"
+services:
+    webserver:
+        image: nginx:alpine
+        container_name: test-nginx
+        restart: unless-stopped
+        tty: true
+        ports:
+            - 10780:80
+        volumes:
+            - ./www/:/var/www
+            - ./docker/nginx/:/etc/nginx/conf.d/
+        working_dir: /var/www/
+
+    npm:
+        image: xaaalera/node-deals-test
+        build:
+            context: .
+            dockerfile: ./docker/node/Dockerfile
+        #    restart: "no"
+        environment:
+            - NODE_ENV=productuon
+        user: $UID:$GID
+        volumes:
+            - ./www:/var/www
+            - ./dev-cache/node_modules:/var/www/node_modules
+
+        working_dir: /var/www
+        entrypoint: sh
+        command:
+            - -c
+            - |
+                npm i
+                npm run build
